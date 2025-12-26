@@ -9,7 +9,7 @@ type NavbarProps = {
 };
 
 export default function Navbar({
-  userName = "Vivek",
+  userName = "Arjit",
   designation = "Admin",
   onLogout,
 }: NavbarProps) {
@@ -46,19 +46,19 @@ export default function Navbar({
           </div>
         </div>
 
-        <button
+        <Link href={"/login"}
           onClick={onLogout}
           className="px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-md bg-red-600 hover:bg-red-700 transition hidden xs:block md:block"
         >
           Logout
-        </button>
+        </Link>
 
-        <button
+        <Link href={"/login"}
           onClick={onLogout}
           className="p-2 bg-red-600 hover:bg-red-700 rounded-md transition block xs:hidden md:hidden"
         >
           <LogOut className="w-5 h-5 text-white" />
-        </button>
+        </Link>
       </div>
     </nav>
   );

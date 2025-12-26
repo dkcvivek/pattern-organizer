@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { Eye, EyeOff, Lock } from "lucide-react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type TabType = "username" | "phone";
 
@@ -23,6 +25,8 @@ export default function LoginPage() {
   const [otp, setOtp] = useState("");
 
   const [errors, setErrors] = useState<Errors>({});
+
+  const router = useRouter();
 
   const validateUsernameLogin = () => {
     const e: Errors = {};
@@ -49,14 +53,20 @@ export default function LoginPage() {
     if (!validateUsernameLogin()) return;
     setIsSubmitting(true);
     console.log("USERNAME_LOGIN", { username, password });
-    setTimeout(() => setIsSubmitting(false), 1200);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      router.push("/");
+    }, 1200);
   };
 
   const handlePhoneLogin = () => {
     if (!validatePhoneLogin()) return;
     setIsSubmitting(true);
     console.log("PHONE_LOGIN", { phone, otp });
-    setTimeout(() => setIsSubmitting(false), 1200);
+    setTimeout(() => {
+      setIsSubmitting(false);
+      router.push("/");
+    }, 1200);
   };
 
   const handleSendOtp = () => {
@@ -92,7 +102,9 @@ export default function LoginPage() {
             <Lock className="text-white w-7 h-7" />
           </div>
           <h1 className="text-3xl font-extrabold text-gray-900">
-            {activeTab === "username" ? "Login with Username " : "Login with Phone"}
+            {activeTab === "username"
+              ? "Login with Username "
+              : "Login with Phone"}
           </h1>
         </div>
 
@@ -178,6 +190,18 @@ export default function LoginPage() {
                 >
                   Sign in
                 </button>
+
+                <div className="text-center mt-5">
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Don&apos;t have an account?{" "}
+                    <Link
+                      href="/register"
+                      className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                    >
+                      Signup
+                    </Link>
+                  </p>
+                </div>
               </div>
             </div>
 
@@ -235,6 +259,18 @@ export default function LoginPage() {
                 >
                   Login
                 </button>
+
+                <div className="text-center mt-5">
+                  <p className="text-sm sm:text-base text-gray-600">
+                    Don&apos;t have an account?{" "}
+                    <Link
+                      href="/register"
+                      className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
+                    >
+                      Signup
+                    </Link>
+                  </p>
+                </div>
               </div>
             </div>
           </div>
