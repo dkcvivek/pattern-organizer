@@ -20,7 +20,10 @@ export default function Navbar({
           href="/"
           className="text-2xl sm:text-3xl font-bold tracking-wide hidden xs:block md:block"
         >
-          Pattern Organizer
+          <div className="flex flex-col justify-center items-center">
+            <img src="./logo.png" alt="Main_Logo" width={80} height={20} />
+          <span className="text-xs -mt-1.25">Pattern Organizer</span>
+          </div>
         </Link>
       </div>
 
