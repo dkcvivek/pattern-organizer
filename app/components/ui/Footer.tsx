@@ -1,6 +1,7 @@
-
 export default function Footer() {
   return (
-    <div>Footer</div>
-  )
+    <footer className="h-12 bg-gray-900 text-gray-400 flex items-center justify-center text-sm">
+      © {new Date().getFullYear()} Pattern Organizer
+    </footer>
+  );
 }
