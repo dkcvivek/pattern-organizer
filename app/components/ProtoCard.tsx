@@ -5,20 +5,20 @@ type Props = {
   onOpenFiles?: (id: number) => void;
 };
 
-const ProtoCard= ({ proto, onOpenFiles }: Props)=> {
+const ProtoCard = ({ proto, onOpenFiles }: Props) => {
   return (
-    <div className="border border-blue-300 rounded-lg bg-blue-50 p-5 flex flex-col justify-between">
+    <div className="border border-[#648DDB] rounded-md bg-[#EEF4FF] p-4 flex flex-col justify-between hover:shadow-md transition">
       <div className="space-y-1">
-        <h3 className="text-lg font-semibold text-blue-900">
+        <h3 className="text-2xl font-semibold text-blue-900">
           {proto.name}
         </h3>
 
-        <p className="text-sm text-blue-800">
+        <p className="text-sm text-blue-800 font-light">
           <span className="font-medium">QR NUMBER :</span>{" "}
           {proto.qr_number}
         </p>
 
-        <p className="text-sm text-blue-800">
+        <p className="text-sm text-blue-800 font-light">
           <span className="font-medium">Status :</span>{" "}
           {proto.status || "NO STATUS"}
         </p>
@@ -32,6 +32,6 @@ const ProtoCard= ({ proto, onOpenFiles }: Props)=> {
       </button>
     </div>
   );
-}
+};
 
-export default ProtoCard; 
+export default ProtoCard;

@@ -5,9 +5,18 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { name: "View", icon: <Eye className="w-6 h-6" />, href: "/" },
-  { name: "Create", icon: <PlusCircle className="w-6 h-6" />, href: "/create" },
-  { name: "Upload", icon: <Upload className="w-6 h-6" />, href: "/upload" },
+  { name: "View", 
+    // icon: <Eye className="w-6 h-6" />,
+     href: "/" 
+  },
+  { name: "Create", 
+    // icon: <PlusCircle className="w-6 h-6" />,
+     href: "/create" 
+  },
+  { name: "Upload", 
+    // icon: <Upload className="w-6 h-6" />,
+     href: "/upload" 
+  },
 ];
 
 const VIEW_ACTIVE_ROUTES = [
