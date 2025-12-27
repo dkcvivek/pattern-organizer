@@ -37,6 +37,36 @@ function page() {
             <td className="px-3 py-4 text-xs whitespace-nowrap">700</td>
             <td className="px-3 py-4 text-xs whitespace-nowrap">Not Shipped</td>
           </tr>
+
+          <tr className="hover:bg-gray-50">
+            <td className="px-3 py-4 text-xs whitespace-nowrap">2</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">
+              EMME FOLDOVER DRESS
+            </td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">NAVAL</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">700</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">Not Shipped</td>
+          </tr>
+
+          <tr className="hover:bg-gray-50">
+            <td className="px-3 py-4 text-xs whitespace-nowrap">3</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">
+              CEILA MAXI DRESS
+            </td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">NS Exports</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">300</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap"> Shipped</td>
+          </tr>
+
+          <tr className="hover:bg-gray-50">
+            <td className="px-3 py-4 text-xs whitespace-nowrap">4</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">
+              INDIGO BRAIDED BELT
+            </td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">NS Exports</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">100</td>
+            <td className="px-3 py-4 text-xs whitespace-nowrap">Not Shipped</td>
+          </tr>
         </tbody>
       </table>
     </>

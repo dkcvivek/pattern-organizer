@@ -9,7 +9,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <Navbar />
       <div className="flex flex-1">
         <Sidebar />
-        <main className="flex-1 p-4 bg-gray-100 min-h-screen">
+        <main className="p-4 bg-gray-100 min-h-screen w-full md:w-[calc(100%-288px)] ml-auto">
           {children}
         </main>
       </div>

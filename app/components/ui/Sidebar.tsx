@@ -5,17 +5,20 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { name: "View", 
-    // icon: <Eye className="w-6 h-6" />,
-     href: "/" 
+  {
+    name: "View",
+    icon: <Eye className="w-6 h-6" />,
+    href: "/",
   },
-  { name: "Create", 
-    // icon: <PlusCircle className="w-6 h-6" />,
-     href: "/create" 
+  {
+    name: "Create",
+    icon: <PlusCircle className="w-6 h-6" />,
+    href: "/create",
   },
-  { name: "Upload", 
-    // icon: <Upload className="w-6 h-6" />,
-     href: "/upload" 
+  {
+    name: "Upload",
+    icon: <Upload className="w-6 h-6" />,
+    href: "/upload",
   },
 ];
 
@@ -32,7 +35,7 @@ export default function Sidebar() {
 
   return (
     <>
-      <aside className="hidden md:flex flex-col w-72 bg-gray-900 text-white h-screen p-4 gap-4">
+      <aside className="hidden md:flex flex-col w-72 bg-gray-900 text-white h-screen p-4 gap-4 fixed top-[96px] left-0">
         {tabs.map((tab) => {
           const isActive =
             tab.name === "View"
@@ -57,13 +60,13 @@ export default function Sidebar() {
         })}
       </aside>
 
-      <nav className="fixed bottom-0 left-0 w-full flex justify-around bg-gray-900 text-white md:hidden p-2 shadow-t">
+      <nav className="fixed bottom-0 left-0 w-full flex justify-around bg-gray-900 text-white md:hidden p-2 shadow-t z-20">
         {tabs.map((tab) => {
           const isActive =
             tab.name === "View"
               ? VIEW_ACTIVE_ROUTES.includes(pathname)
               : pathname === tab.href;
-
+ 
           return (
             <Link
               key={tab.name}
