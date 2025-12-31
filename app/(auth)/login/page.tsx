@@ -5,21 +5,21 @@ import { Eye, EyeOff, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-type TabType = "username" | "phone";
+type TabType = "email" | "phone";
 
 type Errors = {
-  username?: string;
+  email?: string;
   password?: string;
   phone?: string;
   otp?: string;
 };
 
 export default function LoginPage() {
-  const [activeTab, setActiveTab] = useState<TabType>("username");
+  const [activeTab, setActiveTab] = useState<TabType>("email");
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
@@ -27,15 +27,23 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<Errors>({});
 
   const router = useRouter();
+  const gmailRegex = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
 
-  const validateUsernameLogin = () => {
+  const validateEmailLogin = () => {
     const e: Errors = {};
-    if (!username) e.username = "Username is required";
-    else if (username !== username.toLowerCase())
-      e.username = "Username must be lowercase";
-    if (!password) e.password = "Password is required";
-    else if (password.length < 8)
-      e.password = "Password must be at least 8 characters";
+
+    if (!email) {
+      e.email = "Email is required";
+    } else if (!gmailRegex.test(email)) {
+      e.email = "Email is not valid";
+    }
+
+    if (!password) {
+      e.password = "Password is required";
+    } else if (password.length < 6) {
+      e.password = "Password must be at least 6 characters";
+    }
+
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -49,10 +57,12 @@ export default function LoginPage() {
     return Object.keys(e).length === 0;
   };
 
-  const handleUsernameLogin = () => {
-    if (!validateUsernameLogin()) return;
+  const handleEmailLogin = () => {
+    if (!validateEmailLogin()) return;
+
     setIsSubmitting(true);
-    console.log("USERNAME_LOGIN", { username, password });
+    console.log("EMAIL_LOGIN", { email, password });
+
     setTimeout(() => {
       setIsSubmitting(false);
       router.push("/");
@@ -102,9 +112,7 @@ export default function LoginPage() {
             <Lock className="text-white w-7 h-7" />
           </div>
           <h1 className="text-3xl font-extrabold text-gray-900">
-            {activeTab === "username"
-              ? "Login with Username "
-              : "Login with Phone"}
+            {activeTab === "email" ? "Login with Email " : "Login with Phone"}
           </h1>
         </div>
 
@@ -116,7 +124,7 @@ export default function LoginPage() {
               }`}
             />
             <div className="relative flex">
-              {(["username", "phone"] as TabType[]).map((tab) => (
+              {(["email", "phone"] as TabType[]).map((tab) => (
                 <button
                   key={tab}
                   onClick={() => {
@@ -127,7 +135,7 @@ export default function LoginPage() {
                     activeTab === tab ? "text-white" : "text-blue-600"
                   }`}
                 >
-                  {tab === "username" ? "Username Login" : "Phone Login"}
+                  {tab === "email" ? "Email Login" : "Phone Login"}
                 </button>
               ))}
             </div>
@@ -136,7 +144,7 @@ export default function LoginPage() {
           <div className="relative min-h-80">
             <div
               className={`absolute inset-0 ${
-                activeTab === "username"
+                activeTab === "email"
                   ? "opacity-100 pointer-events-auto"
                   : "opacity-0 pointer-events-none"
               } transition-opacity duration-150`}
@@ -144,18 +152,17 @@ export default function LoginPage() {
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm sm:text-base font-semibold text-gray-700 mb-1">
-                    Username
+                    Email
                   </label>
                   <input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" && handleUsernameLogin()
-                    }
-                    className={inputClass(errors.username)}
-                    placeholder="Enter username"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && handleEmailLogin()}
+                    className={inputClass(errors.email)}
+                    placeholder="example@gmail.com"
                   />
-                  <ErrorText text={errors.username} />
+                  <ErrorText text={errors.email} />
                 </div>
 
                 <div>
@@ -168,7 +175,7 @@ export default function LoginPage() {
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       onKeyDown={(e) =>
-                        e.key === "Enter" && handleUsernameLogin()
+                        e.key === "Enter" && handleEmailLogin()
                       }
                       className={inputClass(errors.password) + " pr-12"}
                       placeholder="Enter password"
@@ -185,10 +192,11 @@ export default function LoginPage() {
                 </div>
 
                 <button
-                  onClick={handleUsernameLogin}
-                  className="w-full py-3 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 text-white font-semibold text-base"
+                  onClick={handleEmailLogin}
+                  disabled={isSubmitting}
+                  className={submitButtonClass(isSubmitting)}
                 >
-                  Sign in
+                  {isSubmitting ? <ButtonSpinner /> : "Sign in"}
                 </button>
 
                 <div className="text-center mt-5">
@@ -255,9 +263,10 @@ export default function LoginPage() {
 
                 <button
                   onClick={handlePhoneLogin}
-                  className="w-full py-3 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 text-white font-semibold text-base"
+                  disabled={isSubmitting}
+                  className={submitButtonClass(isSubmitting)}
                 >
-                  Login
+                  {isSubmitting ? <ButtonSpinner /> : "Login"}
                 </button>
 
                 <div className="text-center mt-5">
@@ -279,3 +288,17 @@ export default function LoginPage() {
     </div>
   );
 }
+
+const submitButtonClass = (loading: boolean) =>
+  `
+  w-full h-12 rounded-xl
+  bg-linear-to-r from-blue-600 to-indigo-600
+  text-white font-semibold
+  flex items-center justify-center
+  transition-all duration-200
+  ${loading ? "cursor-not-allowed" : "hover:brightness-110 active:scale-[0.97]"}
+`;
+
+const ButtonSpinner = () => (
+  <span className="w-6 h-6 border-[3px] border-white/40 border-t-white rounded-full animate-spin" />
+);
