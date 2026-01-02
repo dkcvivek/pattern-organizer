@@ -63,7 +63,7 @@ const Page = () => {
   return (
     <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_8px_24px_rgba(0,0,0,0.06)] hover:shadow-[0_12px_32px_rgba(0,0,0,0.08)] transition-shadow duration-300 p-6">
       <div className="pt-8 pb-24 px-4 md:ml-2.5">
-        <div className="w-full md:w-105">
+        <div className="w-full md:w-95">
           <h1 className="text-2xl font-semibold text-gray-900 mb-6">
             Create Style
           </h1>
