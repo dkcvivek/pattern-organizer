@@ -1,28 +1,36 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, User, LogOut } from "lucide-react";
+import { useRouter } from "next/navigation";
 
-type NavbarProps = {
-  userName?: string;
-  designation?: string;
-  onLogout?: () => void;
-};
+export default function Navbar() {
+  const router = useRouter();
+  const [userName, setUserName] = useState<string>("");
 
-export default function Navbar({
-  userName = "Arjit",
-  designation = "Admin",
-  onLogout,
-}: NavbarProps) {
+  useEffect(() => {
+    const name = localStorage.getItem("user_name");
+    if (name) setUserName(name);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    localStorage.removeItem("user_name");
+    localStorage.removeItem("user_email");
+    router.replace("/login");
+  };
+
   return (
     <nav className="w-full h-20 sm:h-24 bg-gray-900 text-white flex items-center justify-between px-4 sm:px-10 sticky top-0 z-50">
       <div className="flex items-center gap-4">
-        <Link
-          href="/"
-          className="text-2xl sm:text-3xl font-bold tracking-wide hidden xs:block md:block"
-        >
-          <div className="flex flex-col justify-center items-center">
-            <img src="./logo.png" alt="Main_Logo" width={80} height={20} />
-          <span className="text-xs -mt-1.25">Pattern Organizer</span>
+        <Link href="/" className="hidden xs:block md:block">
+          <div className="flex flex-col items-center">
+            <img src="./logo.png" alt="Main Logo" width={80} height={20} />
+            <span className="text-xs -mt-1 text-gray-300">
+              Pattern Organizer
+            </span>
           </div>
         </Link>
       </div>
@@ -35,7 +43,8 @@ export default function Navbar({
           <input
             type="text"
             placeholder="Search..."
-            className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-full bg-gray-800 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-700 transition"
+            className="w-full pl-12 pr-4 py-3 sm:py-4 rounded-full bg-gray-800 text-white placeholder-gray-400
+            focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-gray-700 transition"
           />
         </div>
       </div>
@@ -43,25 +52,27 @@ export default function Navbar({
       <div className="flex items-center gap-4">
         <div className="flex items-center gap-2">
           <User className="w-6 h-6 sm:w-7 sm:h-7 text-gray-300" />
-          <div className="text-right leading-tight hidden xs:block md:block">
-            <p className="text-sm sm:text-base font-semibold">{userName}</p>
-            <p className="text-xs sm:text-sm text-gray-400">{designation}</p>
+          <div className="text-right leading-tight">
+            <p className="text-xs sm:text-sm md:text-base font-semibold text-gray-100 max-w-[90px] truncate">
+              {userName || "User"}
+            </p>
           </div>
         </div>
 
-        <Link href={"/login"}
-          onClick={onLogout}
-          className="px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-md bg-red-600 hover:bg-red-700 transition hidden xs:block md:block"
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 sm:py-2.5 text-sm sm:text-base rounded-md
+          bg-red-600 hover:bg-red-700 transition hidden xs:block md:block"
         >
           Logout
-        </Link>
+        </button>
 
-        <Link href={"/login"}
-          onClick={onLogout}
+        <button
+          onClick={handleLogout}
           className="p-2 bg-red-600 hover:bg-red-700 rounded-md transition block xs:hidden md:hidden"
         >
           <LogOut className="w-5 h-5 text-white" />
-        </Link>
+        </button>
       </div>
     </nav>
   );
