@@ -1,6 +1,6 @@
 "use client";
 import ProtoCard from "@/app/components/ProtoCard";
-import { Proto } from "@/app/types/proto";
+import { Proto } from "@/app/types/dashboard";
 
 const protos: Proto[] = [
   {

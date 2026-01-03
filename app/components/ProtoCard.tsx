@@ -1,4 +1,4 @@
-import { Proto } from "../types/proto";
+import { Proto } from "../types/dashboard";
 
 type Props = {
   proto: Proto;

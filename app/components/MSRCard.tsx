@@ -1,8 +1,7 @@
 "use client";
 import Link from "next/link";
-import { MSR } from "../types/msr";
-import { Icon } from "@iconify/react";
 import { CalendarDays } from "lucide-react";
+import { MSR } from "../types/dashboard";
 
 export default function MSRCard({ msr }: { msr: MSR }) {
   return (

@@ -1,9 +1,7 @@
 import MSRCard from "@/app/components/MSRCard";
-import { MSR } from "@/app/types/msr";
-// import { apiFetch } from "@/lib/api";
+import { MSR } from "@/app/types/dashboard";
 
 export default async function MSRPage() {
-//   const msrs = await apiFetch<MSR[]>("/msr/");
 
   const msrs: MSR[] = [
   {

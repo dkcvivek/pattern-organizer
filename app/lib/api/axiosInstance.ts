@@ -1,10 +1,34 @@
-import axios from "axios";
+import axios, { Axios } from "axios";
 import { apiConfig } from "./apiConfig";
 
 const axiosInstance = axios.create({
   baseURL: apiConfig.baseURL,
   timeout: apiConfig.timeout,
 });
+
+let isRefreshing = false;
+
+const clearTokenData = (): void => {
+  if (typeof window === "undefined") return;
+
+  localStorage.removeItem("token");
+};
+
+let failedQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: any) => void;
+}> = [];
+
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach(({ resolve, reject }) => {
+    if (error) {
+      reject(error);
+    } else {
+      resolve(token!);
+    }
+  });
+  failedQueue = [];
+};
 
 axiosInstance.interceptors.request.use(
   (config) => {
@@ -14,26 +38,88 @@ axiosInstance.interceptors.request.use(
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
+    if (config.headers && !config.headers["Content-Type"]) {
+      if (config.data instanceof FormData) {
+        delete config.headers["Content-Type"];
+      } else {
+        config.headers["Content-Type"] = "application/json";
+      }
+    }
+
+    if (config.headers) {
+      config.headers["Accept"] = "application/json";
+    }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    const status = error.response?.status;
+  (response) => {
+    if (response.data?.error_status === true) {
+      return Promise.reject(
+        new Error(response.data.message || "Something went wrong")
+      );
+    }
+    return response;
+  },
+  async (error) => {
+    const failedRqst = error.config;
 
-    if (status === 401) {
-      localStorage.removeItem("access_token");
-      window.location.href = "/login";
+    if (!error.response) {
+      return Promise.reject(
+        new Error("Network error. Please check your connection.")
+      );
     }
 
-    if (status >= 500) {
-      alert("Server error. Please try again.");
+    if (error.response.status === 401 && !failedRqst._retry) {
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        });
+      }
+
+      failedRqst._retry = true;
+      isRefreshing = true;
+
+      if (typeof window === "undefined") return Promise.reject("error");
+      const refreshToken = localStorage.getItem("refresh_token");
+
+      if (!refreshToken) {
+        clearTokenData();
+        window.location.href = "/login";
+        return Promise.reject(error);
+      }
+
+      try {
+        // update the url here
+        const response = await axios.post("", { refresh: refreshToken });
+
+        if (response.data.error_status === false && response.data.data) {
+          localStorage.setItem("access_token", response.data.data.access);
+          failedRqst.headers.Authorization = `Bearer ${response.data.data.access}`;
+          processQueue(null, response.data.data.access);
+
+          isRefreshing = false;
+
+          return axiosInstance(failedRqst);
+        } else {
+          throw new Error("TOPken refresh failed.");
+        }
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        isRefreshing = false;
+        clearTokenData();
+        window.location.href = "/login";
+        return Promise.reject(refreshError);
+      }
     }
 
-    return Promise.reject(error);
+    const errorMessage =  error.response?.data?.message || error.message || "An error occurred";
+
+    return Promise.reject(new Error(errorMessage));
   }
 );
 
