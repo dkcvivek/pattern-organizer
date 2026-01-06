@@ -1,6 +1,5 @@
-import React from "react";
-import { Category } from "../types/category";
 import Link from "next/link";
+import { Category } from "../types/dashboard";
 
 function CategoryCard({ category }: { category: Category }) {
   return (

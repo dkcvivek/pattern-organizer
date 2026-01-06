@@ -1,7 +1,6 @@
 "use client";
 import CategoryCard from "@/app/components/CategoryCard";
-import { Category } from "@/app/types/category";
-import { useEffect } from "react";
+import { Category } from "@/app/types/dashboard";
 
 const CategoryPage =()=> {
 
