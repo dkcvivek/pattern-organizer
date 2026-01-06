@@ -53,7 +53,8 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <User className="w-6 h-6 sm:w-7 sm:h-7 text-gray-300" />
           <div className="text-right leading-tight">
-            <p className="text-xs sm:text-sm md:text-base font-semibold text-gray-100 max-w-[90px] truncate">
+            <p className="text-xs sm:text-sm md:text-base font-semibold text-gray-100 max-w-22.5
+             truncate">
               {userName || "User"}
             </p>
           </div>

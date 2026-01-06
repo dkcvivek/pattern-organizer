@@ -1,63 +1,152 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
-
-const msrTypes = [
-  "PRINT DEVELOPMENT",
-  "CHASE",
-  "ALEX",
-  "PERSONAL",
-  "5/30 MSR",
-  "4/30 MSR",
-];
-
-const categories = ["ACCESSORIES", "SKIRT", "PANT", "TOPS", "DRESS", "KNIT"];
+import axios from "axios";
 
 type FormState = {
   styleName: string;
-  msrType: string;
+  msrId: number | "";
   jcNo: string;
-  category: string;
+  categoryId: number | "";
   remark: string;
+};
+
+type FormErrors = {
+  styleName?: string;
+  msrId?: string;
+  jcNo?: string;
+  categoryId?: string;
+  remark?: string;
+};
+
+type MSRApiItem = {
+  msr_id: number;
+  msr_name: string;
+  year: string;
+};
+
+type CategoryApiItem = {
+  category_id: number;
+  category_name: string;
 };
 
 const Page = () => {
   const [form, setForm] = useState<FormState>({
     styleName: "",
-    msrType: "",
+    msrId: "",
     jcNo: "",
-    category: "",
+    categoryId: "",
     remark: "",
   });
 
-  const [errors, setErrors] = useState<Partial<FormState>>({});
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [msrTypes, setMsrTypes] = useState<MSRApiItem[]>([]);
+  const [categories, setCategories] = useState<CategoryApiItem[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("access_token");
+
+    const headers = {
+      Authorization: token ? `Bearer ${token}` : "",
+    };
+
+    const fetchMsrTypes = async () => {
+      const res = await axios.get(
+        "http://128.100.10.210:8000/all-msr/",
+        { headers }
+      );
+      setMsrTypes(res.data?.data || []);
+    };
+
+    const fetchCategories = async () => {
+      const res = await axios.get(
+        "http://128.100.10.210:8000/all-category/",
+        { headers }
+      );
+      setCategories(res.data?.data || []);
+    };
+
+    fetchMsrTypes();
+    fetchCategories();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<
       HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
     >
   ) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
-    setErrors({ ...errors, [e.target.name]: "" });
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]:
+        name === "msrId" || name === "categoryId"
+          ? value === ""
+            ? ""
+            : Number(value)
+          : value,
+    }));
+
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const validate = () => {
-    const newErrors: Partial<FormState> = {};
-    Object.entries(form).forEach(([key, value]) => {
-      if (!value.trim()) {
-        newErrors[key as keyof FormState] = "This field is required";
-      }
-    });
+    const newErrors: FormErrors = {};
+
+    if (!form.styleName) newErrors.styleName = "This field is required";
+    if (!form.msrId) newErrors.msrId = "This field is required";
+    if (!form.jcNo) newErrors.jcNo = "This field is required";
+    if (!form.categoryId) newErrors.categoryId = "This field is required";
+    if (!form.remark) newErrors.remark = "This field is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    console.log("Form Data:", form);
+    const token = localStorage.getItem("access_token");
+
+    const payload = {
+      name: form.styleName,
+      jc_no: Number(form.jcNo),
+      remark: form.remark,
+      msr_id: form.msrId,
+      category_id: form.categoryId,
+    };
+
+    try {
+      setLoading(true);
+
+      await axios.post(
+        "http://128.100.10.210:8000/create-style/",
+        payload,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      alert("Style created successfully");
+
+      setForm({
+        styleName: "",
+        msrId: "",
+        jcNo: "",
+        categoryId: "",
+        remark: "",
+      });
+    } catch (err: any) {
+      alert(err?.response?.data?.message || "Create failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -78,20 +167,20 @@ const Page = () => {
               />
             </Field>
 
-            <Field label="MSR Type" error={errors.msrType}>
-              <SelectWrapper error={errors.msrType}>
+            <Field label="MSR Type" error={errors.msrId}>
+              <SelectWrapper error={errors.msrId}>
                 <select
-                  name="msrType"
-                  value={form.msrType}
+                  name="msrId"
+                  value={form.msrId}
                   onChange={handleChange}
-                  className={selectClass(errors.msrType)}
+                  className={selectClass(errors.msrId)}
                 >
                   <option value="" disabled>
                     Select MSR Type
                   </option>
-                  {msrTypes.map((type) => (
-                    <option key={type} value={type}>
-                      {type}
+                  {msrTypes.map((m) => (
+                    <option key={m.msr_id} value={m.msr_id}>
+                      {m.msr_name}
                     </option>
                   ))}
                 </select>
@@ -107,20 +196,20 @@ const Page = () => {
               />
             </Field>
 
-            <Field label="Category" error={errors.category}>
-              <SelectWrapper error={errors.category}>
+            <Field label="Category" error={errors.categoryId}>
+              <SelectWrapper error={errors.categoryId}>
                 <select
-                  name="category"
-                  value={form.category}
+                  name="categoryId"
+                  value={form.categoryId}
                   onChange={handleChange}
-                  className={selectClass(errors.category)}
+                  className={selectClass(errors.categoryId)}
                 >
                   <option value="" disabled>
                     Select Category
                   </option>
-                  {categories.map((cat) => (
-                    <option key={cat} value={cat}>
-                      {cat}
+                  {categories.map((c) => (
+                    <option key={c.category_id} value={c.category_id}>
+                      {c.category_name}
                     </option>
                   ))}
                 </select>
@@ -139,11 +228,12 @@ const Page = () => {
 
             <div className="pt-2">
               <button
+                disabled={loading}
                 type="submit"
                 className="h-10 px-6 rounded-md bg-blue-600 text-white text-sm font-semibold
                 hover:bg-blue-700 active:scale-[0.98] transition-transform"
               >
-                Save
+                {loading ? "Saving..." : "Save"}
               </button>
             </div>
           </form>
@@ -179,8 +269,9 @@ const SelectWrapper = ({
   <div className="relative">
     {children}
     <ChevronDown
-      className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4
-      ${error ? "text-red-500" : "text-gray-400"}`}
+      className={`pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 ${
+        error ? "text-red-500" : "text-gray-400"
+      }`}
     />
   </div>
 );
