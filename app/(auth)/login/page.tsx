@@ -13,8 +13,12 @@ type Errors = {
 export default function LoginPage() {
   const router = useRouter();
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+  const { email, password } = formData;
+
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
@@ -27,6 +31,11 @@ export default function LoginPage() {
     const t = setTimeout(() => setFormError(null), 3000);
     return () => clearTimeout(t);
   }, [formError]);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
   const validateLogin = () => {
     const e: Errors = {};
@@ -41,7 +50,9 @@ export default function LoginPage() {
     return Object.keys(e).length === 0;
   };
 
-  const handleLogin = async () => {
+  const handleLogin = async (e: any) => {
+    if (e) e.preventDefault();
+
     setFormError(null);
     if (!validateLogin()) return;
 
@@ -49,24 +60,15 @@ export default function LoginPage() {
       setIsSubmitting(true);
 
       const res = await axios.post(
-        "http://128.100.10.210:8000/login/",
+        "/api/auth/login", 
         { email, password },
         { validateStatus: () => true }
       );
 
-      if (
-        res.status === 200 &&
-        res.data?.status === 200 &&
-        res.data?.error_status === false &&
-        res.data?.data?.access &&
-        res.data?.data?.refresh
-      ) {
-        localStorage.setItem("access_token", res.data.data.access);
-        localStorage.setItem("refresh_token", res.data.data.refresh);
-        localStorage.setItem("user_name", res.data.data.name);
-        router.push("/");
-        return;
-      }
+      if (res.status === 200 && res.data?.success) {
+      router.push("/");
+      return;
+    }
 
       if (res.status === 401) {
         setFormError("Incorrect password. Please try again.");
@@ -137,13 +139,14 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className="w-full space-y-4">
+          <form onSubmit={handleLogin} className="w-full space-y-4">
             <div>
               <label className="font-semibold text-gray-700">Email</label>
               <input
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                // onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                 className={inputClass(errors.email)}
                 placeholder="example@gmail.com"
               />
@@ -154,10 +157,11 @@ export default function LoginPage() {
               <label className="font-semibold text-gray-700">Password</label>
               <div className="relative">
                 <input
+                  name="password"
                   type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                  value={formData.password}
+                  onChange={handleChange}
+                  // onKeyDown={(e) => e.key === "Enter" && handleLogin()}
                   className={inputClass(errors.password) + " pr-12"}
                   placeholder="Enter password"
                 />
@@ -173,7 +177,7 @@ export default function LoginPage() {
             </div>
 
             <button
-              onClick={handleLogin}
+              type="submit"
               disabled={isSubmitting}
               className={`w-full h-12 rounded-xl bg-linear-to-r from-blue-600 to-indigo-600 text-white font-semibold
               transition-all
@@ -185,7 +189,7 @@ export default function LoginPage() {
             >
               {isSubmitting ? "Signing in..." : "Sign in"}
             </button>
-          </div>
+          </form>
         </div>
       </div>
     </div>

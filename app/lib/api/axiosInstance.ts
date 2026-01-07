@@ -4,6 +4,7 @@ import { apiConfig } from "./apiConfig";
 const axiosInstance = axios.create({
   baseURL: apiConfig.baseURL,
   timeout: apiConfig.timeout,
+  withCredentials: true,
 });
 
 let isRefreshing = false;
@@ -32,13 +33,6 @@ const processQueue = (error: any, token: string | null = null) => {
 
 axiosInstance.interceptors.request.use(
   (config) => {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("access_token");
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    }
-
     if (config.headers && !config.headers["Content-Type"]) {
       if (config.data instanceof FormData) {
         delete config.headers["Content-Type"];
@@ -85,8 +79,14 @@ axiosInstance.interceptors.response.use(
       isRefreshing = true;
 
       if (typeof window === "undefined") return Promise.reject("error");
-      const refreshToken = localStorage.getItem("refresh_token");
+      const response = await axios.post(
+        "/api/auth/refresh",
+        {},
+        { withCredentials: true }
+      );
 
+      const refreshToken = response.data?.success ? true : false;
+      
       if (!refreshToken) {
         clearTokenData();
         window.location.href = "/login";
@@ -106,7 +106,7 @@ axiosInstance.interceptors.response.use(
 
           return axiosInstance(failedRqst);
         } else {
-          throw new Error("TOPken refresh failed.");
+          throw new Error("Token refresh failed.");
         }
       } catch (refreshError) {
         processQueue(refreshError, null);
@@ -117,7 +117,8 @@ axiosInstance.interceptors.response.use(
       }
     }
 
-    const errorMessage =  error.response?.data?.message || error.message || "An error occurred";
+    const errorMessage =
+      error.response?.data?.message || error.message || "An error occurred";
 
     return Promise.reject(new Error(errorMessage));
   }

@@ -14,12 +14,15 @@ export default function Navbar() {
     if (name) setUserName(name);
   }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-    localStorage.removeItem("user_name");
-    localStorage.removeItem("user_email");
-    router.replace("/login");
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "include",
+      });
+    } finally {
+      window.location.href = "/login";
+    }
   };
 
   return (
@@ -53,8 +56,10 @@ export default function Navbar() {
         <div className="flex items-center gap-2">
           <User className="w-6 h-6 sm:w-7 sm:h-7 text-gray-300" />
           <div className="text-right leading-tight">
-            <p className="text-xs sm:text-sm md:text-base font-semibold text-gray-100 max-w-22.5
-             truncate">
+            <p
+              className="text-xs sm:text-sm md:text-base font-semibold text-gray-100 max-w-22.5
+             truncate"
+            >
               {userName || "User"}
             </p>
           </div>
