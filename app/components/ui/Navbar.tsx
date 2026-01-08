@@ -3,15 +3,17 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Search, User, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 export default function Navbar() {
-  const router = useRouter();
   const [userName, setUserName] = useState<string>("");
 
   useEffect(() => {
-    const name = localStorage.getItem("user_name");
-    if (name) setUserName(name);
+    const name = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("user_name="))
+      ?.split("=")[1];
+
+    if (name) setUserName(decodeURIComponent(name));
   }, []);
 
   const handleLogout = async () => {

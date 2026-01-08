@@ -1,17 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get("access_token")?.value;
 
-  const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isAuthPage = pathname === "/login";
 
-  // ❌ Not logged in → block everything except auth pages
   if (!token && !isAuthPage) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // ✅ Logged in → block login/register
   if (token && isAuthPage) {
     return NextResponse.redirect(new URL("/", req.url));
   }
